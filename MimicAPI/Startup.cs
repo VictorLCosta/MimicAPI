@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MimicAPI.Database;
 
 namespace MimicAPI
 {
@@ -14,6 +16,10 @@ namespace MimicAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddDbContext<MimicContext>(opt => {
+                opt.UseSqlite(@"Data Source = Database\Mimic.db");
+            });
         }
 
        
