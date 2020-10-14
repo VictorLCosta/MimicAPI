@@ -13,7 +13,7 @@ namespace MimicAPI
     { 
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddMvc();
         }
 
        
@@ -28,6 +28,8 @@ namespace MimicAPI
             {
                 await context.Response.WriteAsync("Hello World!");
             });
+
+            app.UseMvc();
         }
     }
 }
