@@ -18,7 +18,7 @@ namespace MimicAPI
             services.AddMvc();
 
             services.AddDbContext<MimicContext>(opt => {
-                opt.UseSqlite(@"Data Source = Database\Mimic.db");
+                opt.UseSqlite(@"Data Source=Database\Mimic.db");
             });
         }
 
@@ -35,6 +35,7 @@ namespace MimicAPI
                 await context.Response.WriteAsync("Hello World!");
             });
 
+            app.UseStatusCodePages();
             app.UseMvc();
         }
     }

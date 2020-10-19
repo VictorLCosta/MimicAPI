@@ -30,33 +30,60 @@ namespace MimicAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> FindWord(int id)
         {
-            return Ok(await _context.Words.FindAsync(id));
+            var obj = await _context.Words.FindAsync(id);
+
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(obj);
         }
 
         [Route("")]
         [HttpPost]
-        public async Task<IActionResult> Register(Word word)
+        public async Task<IActionResult> Register([FromBody]Word word)
         {
             await _context.Words.AddAsync(word);
-            return Ok();
+            await _context.SaveChangesAsync();
+
+            return Created($"api/words/{word.Id}", word);
         }
 
         [Route("{id}")]
         [HttpPut]
-        public async Task<IActionResult> Update(int id, Word word)
+        public async Task<IActionResult> Update([FromBody]Word word, int id)
         {
-            _context.Words.Update(word);
+            var obj = await _context.Words.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
 
-            return Ok();
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            word.Id = id;
+            _context.Words.Update(word);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [Route("{id}")]
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            _context.Words.Remove(await _context.Words.FindAsync(id));
+            var obj = await _context.Words.FindAsync(id);
 
-            return Ok();
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            obj.Active = false;
+            _context.Words.Update(obj);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
