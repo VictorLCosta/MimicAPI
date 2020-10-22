@@ -21,9 +21,15 @@ namespace MimicAPI.Controllers
 
         [Route("")]
         [HttpGet]
-        public async Task<IActionResult> FindAllWords() 
+        public IActionResult FindAllWords(DateTime? date) 
         {
-            return Ok(await _context.Words.ToListAsync());
+            var item = _context.Words.AsQueryable();
+
+            if(date.HasValue)
+            {
+                item = item.Where(i => i.CreationDate >= date.Value || i.UpdateDate >= date.Value);
+            }
+            return Ok(item);
         }
 
         [Route("{id}")]
