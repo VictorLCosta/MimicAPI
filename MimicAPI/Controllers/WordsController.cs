@@ -21,13 +21,18 @@ namespace MimicAPI.Controllers
 
         [Route("")]
         [HttpGet]
-        public IActionResult FindAllWords(DateTime? date) 
+        public IActionResult FindAllWords(DateTime? date, int? numPage, int? regPerPage) 
         {
             var item = _context.Words.AsQueryable();
 
             if(date.HasValue)
             {
                 item = item.Where(i => i.CreationDate >= date.Value || i.UpdateDate >= date.Value);
+            }
+
+            if(numPage.HasValue)
+            {
+                item = item.Skip((numPage.Value - 1) * regPerPage.Value).Take(regPerPage.Value);
             }
             return Ok(item);
         }
