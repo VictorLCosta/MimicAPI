@@ -7,7 +7,7 @@ namespace MimicAPI.Repositories.Contracts
 {
     public interface IWordRepository
     {
-         Task<List<Word>> FindAllWordsAsync(WordUrlQuery query);
+         PaginationList<Word> FindAllWordsAsync(WordUrlQuery query);
          Task<Word> FindWordAsync(int id);
          Task CreateAsync(Word word);
          Task UpdateAsync(Word word);

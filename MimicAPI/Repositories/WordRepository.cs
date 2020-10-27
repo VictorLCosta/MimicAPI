@@ -14,8 +14,9 @@ namespace MimicAPI.Repositories
     {
         private readonly MimicContext _context;
 
-        public Task<List<Word>> FindAllWordsAsync(WordUrlQuery query)
+        public PaginationList<Word> FindAllWordsAsync(WordUrlQuery query)
         {
+            var list = new PaginationList<Word>();
             var item = _context.Words.AsNoTracking().AsQueryable();
 
             if(query.date.HasValue)
@@ -33,9 +34,12 @@ namespace MimicAPI.Repositories
                 pagination.RegisterPerPage = query.regPerPage.Value;
                 pagination.TotalRegisters = qtdRegisters;
                 pagination.TotalPages = (int)Math.Ceiling((double)pagination.TotalRegisters / pagination.RegisterPerPage);
+
+                list.Pagination = pagination;
             }
 
-            return (Task<List<Word>>)item;
+            list.AddRange(item.ToList());
+            return list;
         }
 
         public async Task<Word> FindWordAsync(int id)
