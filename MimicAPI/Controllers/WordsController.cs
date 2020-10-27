@@ -25,30 +25,9 @@ namespace MimicAPI.Controllers
         [HttpGet]
         public IActionResult FindAllWords([FromQuery]WordUrlQuery query) 
         {
-            var item = _context.Words.AsQueryable();
-
-            if(query.date.HasValue)
+            if(query.numPage > pagination.TotalPages)
             {
-                item = item.Where(i => i.CreationDate >= query.date.Value || i.UpdateDate >= query.date.Value);
-            }
-
-            if(query.numPage.HasValue)
-            {
-                var qtdRegister = item.Count();
-                item = item.Skip((query.numPage.Value - 1) * query.regPerPage.Value).Take(query.regPerPage.Value);
-
-                var pagination = new Pagination();
-                pagination.PageNumber = query.numPage.Value;
-                pagination.RegisterPerPage = query.regPerPage.Value;
-                pagination.TotalRegisters = qtdRegister;
-                pagination.TotalPages = (int)Math.Ceiling(((double)pagination.TotalRegisters / pagination.RegisterPerPage));
-
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pagination));
-
-                if(query.numPage > pagination.TotalPages)
-                {
                     return NotFound();
-                }
             }
             return Ok(item);
         }
@@ -57,8 +36,6 @@ namespace MimicAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> FindWord(int id)
         {
-            var obj = await _context.Words.FindAsync(id);
-
             if (obj == null)
             {
                 return NotFound();
@@ -71,9 +48,6 @@ namespace MimicAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody]Word word)
         {
-            await _context.Words.AddAsync(word);
-            await _context.SaveChangesAsync();
-
             return Created($"api/words/{word.Id}", word);
         }
 
@@ -89,8 +63,7 @@ namespace MimicAPI.Controllers
             }
 
             word.Id = id;
-            _context.Words.Update(word);
-            await _context.SaveChangesAsync();
+            
 
             return NoContent();
         }
@@ -99,16 +72,7 @@ namespace MimicAPI.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            var obj = await _context.Words.FindAsync(id);
-
-            if (obj == null)
-            {
-                return NotFound();
-            }
-
-            obj.Active = false;
-            _context.Words.Update(obj);
-            await _context.SaveChangesAsync();
+            
 
             return NoContent();
         }
