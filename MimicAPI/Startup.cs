@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MimicAPI.Database;
 using MimicAPI.Repositories.Contracts;
 using MimicAPI.Repositories;
+using AutoMapper;
+using MimicAPI.Helpers;
 
 namespace MimicAPI
 {
@@ -17,11 +19,20 @@ namespace MimicAPI
     { 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            #region AutoMapper Config
+            var config = new MapperConfiguration(cfg => {
+                cfg.AddProfile(new DTOMapperProfile());
+            });
+
+            IMapper mapper = config.CreateMapper();
+            services.AddSingleton(mapper);
+            #endregion
 
             services.AddDbContext<MimicContext>(opt => {
                 opt.UseSqlite(@"Data Source=Database\Mimic.db");
             });
+
+            services.AddMvc();
 
             //REPOSITORIES
             services.AddScoped<IWordRepository, WordRepository>();

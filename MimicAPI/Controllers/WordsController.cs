@@ -9,6 +9,7 @@ using MimicAPI.Models;
 using MimicAPI.Helpers;
 using MimicAPI.Repositories.Contracts;
 using Newtonsoft.Json;
+using AutoMapper;
 
 namespace MimicAPI.Controllers
 {
