@@ -31,21 +31,26 @@ namespace MimicAPI.Controllers
         {
             var item = _repository.FindAllWordsAsync(query);
 
-            if(item == null)
+            if(item.Count == 0)
             {
                 return NotFound();
             }
-            if(query.numPage > item.Pagination.PageNumber)
+            if(item.Pagination != null)
             {
-                return NotFound();
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Pagination));
             }
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Pagination));
-            return Ok(item);
+            var list = _mapper.Map<PaginationList<Word>, PaginationList<DTOWord>>(item);
+            foreach(var word in list)
+            {
+                word.Links = new List<DTOLink>();
+                word.Links.Add(new DTOLink("self", Url.Link("FindWord", new {id = word.Id}), "GET"));
+            }
+
+            return Ok(list);
         }
 
-        [Route("{id}")]
-        [HttpGet]
+        [HttpGet("{id}", Name = "FindWord")]
         public async Task<IActionResult> FindWord(int id)
         {
             var obj = await _repository.FindWordAsync(id);
@@ -57,7 +62,10 @@ namespace MimicAPI.Controllers
             
             DTOWord wordDTO = _mapper.Map<Word, DTOWord>(obj);
             wordDTO.Links = new List<DTOLink>();
-            wordDTO.Links.Add(new DTOLink("self", $"https://localhost:5001/api/words/{wordDTO.Id}", "GET"));
+
+            wordDTO.Links.Add(new DTOLink("self", Url.Link("FindWord", new { id = wordDTO.Id }), "GET"));
+            wordDTO.Links.Add(new DTOLink("update", $"https://localhost:5001/api/words/{wordDTO.Id}", "PUT"));
+            wordDTO.Links.Add(new DTOLink("delete", $"https://localhost:5001/api/words/{wordDTO.Id}", "DELETE"));
 
             return Ok(wordDTO);
         }
@@ -71,8 +79,7 @@ namespace MimicAPI.Controllers
             return Created($"api/words/{word.Id}", word);
         }
 
-        [Route("{id}")]
-        [HttpPut]
+        [HttpPut("{id}", Name = "UpdateWord")]
         public async Task<IActionResult> Update([FromBody]Word word, int id)
         {
             var obj = await _repository.FindWordAsync(id);
@@ -88,8 +95,7 @@ namespace MimicAPI.Controllers
             return NoContent();
         }
 
-        [Route("{id}")]
-        [HttpDelete]
+        [HttpDelete("{id}", Name = "DeleteWord")]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _repository.FindWordAsync(id);
