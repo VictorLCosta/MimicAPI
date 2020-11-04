@@ -14,6 +14,11 @@ namespace MimicAPI.Repositories
     {
         private readonly MimicContext _context;
 
+        public WordRepository(MimicContext context)
+        {
+            _context = context;
+        }
+
         public PaginationList<Word> FindAllWordsAsync(WordUrlQuery query)
         {
             var list = new PaginationList<Word>();

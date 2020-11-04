@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MimicAPI.Database;
 using MimicAPI.Models;
 using MimicAPI.Helpers;
 using MimicAPI.Repositories.Contracts;
 using Newtonsoft.Json;
 using AutoMapper;
+using MimicAPI.Models.DTO;
 
 namespace MimicAPI.Controllers
 {
@@ -17,10 +17,12 @@ namespace MimicAPI.Controllers
     public class WordsController : ControllerBase
     {
         private readonly IWordRepository _repository;
+        private readonly IMapper _mapper;
 
-        public WordsController(MimicContext context, IWordRepository repository)
+        public WordsController(IWordRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         [Route("")]
@@ -52,8 +54,12 @@ namespace MimicAPI.Controllers
             {
                 return NotFound();
             }
+            
+            DTOWord wordDTO = _mapper.Map<Word, DTOWord>(obj);
+            wordDTO.Links = new List<DTOLink>();
+            wordDTO.Links.Add(new DTOLink("self", $"https://localhost:5001/api/words/{wordDTO.Id}", "GET"));
 
-            return Ok(obj);
+            return Ok(wordDTO);
         }
 
         [Route("")]
