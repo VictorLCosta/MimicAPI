@@ -80,7 +80,6 @@ namespace MimicAPI.Controllers
             }
             
             DTOWord wordDTO = _mapper.Map<Word, DTOWord>(obj);
-            wordDTO.Links = new List<DTOLink>();
 
             wordDTO.Links.Add(new DTOLink("self", Url.Link("FindWord", new { id = wordDTO.Id }), "GET"));
             wordDTO.Links.Add(new DTOLink("update", Url.Link("UpdateWord", new {id = wordDTO.Id}), "PUT"));
@@ -95,7 +94,10 @@ namespace MimicAPI.Controllers
         {
             await _repository.CreateAsync(word);
 
-            return Created($"api/words/{word.Id}", word);
+            var dtoword = _mapper.Map<Word, DTOWord>(word);
+            dtoword.Links.Add(new DTOLink("self", Url.Link("FindWord", new {id = dtoword.Id}), "GET"));
+
+            return Created($"api/words/{word.Id}", dtoword);
         }
 
         [HttpPut("{id}", Name = "UpdateWord")]
@@ -110,6 +112,9 @@ namespace MimicAPI.Controllers
 
             word.Id = id;
             await _repository.UpdateAsync(obj);
+
+            var dtoword = _mapper.Map<Word, DTOWord>(word);
+            dtoword.Links.Add(new DTOLink("self", Url.Link("FindWord", new {id = dtoword.Id}), "GET"));
 
             return NoContent();
         }
