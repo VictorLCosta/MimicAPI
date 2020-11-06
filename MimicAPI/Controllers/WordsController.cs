@@ -25,29 +25,48 @@ namespace MimicAPI.Controllers
             _mapper = mapper;
         }
 
-        [Route("")]
-        [HttpGet]
-        public IActionResult FindAllWords([FromQuery]WordUrlQuery query) 
+        [HttpGet("", Name = "FindAllWords")]
+        public IActionResult FindAllWords([FromQuery]WordUrlQuery query)
         {
             var item = _repository.FindAllWordsAsync(query);
 
-            if(item.Count == 0)
+            if (item.Results.Count == 0)
             {
                 return NotFound();
             }
-            if(item.Pagination != null)
-            {
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Pagination));
-            }
 
-            var list = _mapper.Map<PaginationList<Word>, PaginationList<DTOWord>>(item);
-            foreach(var word in list)
-            {
-                word.Links = new List<DTOLink>();
-                word.Links.Add(new DTOLink("self", Url.Link("FindWord", new {id = word.Id}), "GET"));
-            }
+            PaginationList<DTOWord> list = CreateLinkListDTOWord(query, item);
 
             return Ok(list);
+        }
+
+        private PaginationList<DTOWord> CreateLinkListDTOWord(WordUrlQuery query, PaginationList<Word> item)
+        {
+            var list = _mapper.Map<PaginationList<Word>, PaginationList<DTOWord>>(item);
+            foreach (var word in list.Results)
+            {
+                word.Links = new List<DTOLink>();
+                word.Links.Add(new DTOLink("self", Url.Link("FindWord", new { id = word.Id }), "GET"));
+            }
+
+            list.Links.Add(new DTOLink("self", Url.Link("FindAllWords", query), "GET"));
+            if (item.Pagination != null)
+            {
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Pagination));
+
+                if (query.numPage.Value + 1 <= item.Pagination.TotalPages)
+                {
+                    var queryString = new WordUrlQuery() { numPage = query.numPage + 1, regPerPage = query.regPerPage, date = query.date };
+                    list.Links.Add(new DTOLink("next", Url.Link("FindAllWords", queryString), "GET"));
+                }
+                if (query.numPage.Value - 1 > 0)
+                {
+                    var queryString = new WordUrlQuery() { numPage = query.numPage - 1, regPerPage = query.regPerPage, date = query.date };
+                    list.Links.Add(new DTOLink("prev", Url.Link("FindAllWords", queryString), "GET"));
+                }
+            }
+
+            return list;
         }
 
         [HttpGet("{id}", Name = "FindWord")]
@@ -64,8 +83,8 @@ namespace MimicAPI.Controllers
             wordDTO.Links = new List<DTOLink>();
 
             wordDTO.Links.Add(new DTOLink("self", Url.Link("FindWord", new { id = wordDTO.Id }), "GET"));
-            wordDTO.Links.Add(new DTOLink("update", $"https://localhost:5001/api/words/{wordDTO.Id}", "PUT"));
-            wordDTO.Links.Add(new DTOLink("delete", $"https://localhost:5001/api/words/{wordDTO.Id}", "DELETE"));
+            wordDTO.Links.Add(new DTOLink("update", Url.Link("UpdateWord", new {id = wordDTO.Id}), "PUT"));
+            wordDTO.Links.Add(new DTOLink("delete", Url.Link("DeleteWord", new {id = wordDTO.Id}), "DELETE"));
 
             return Ok(wordDTO);
         }
