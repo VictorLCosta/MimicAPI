@@ -92,6 +92,16 @@ namespace MimicAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody]Word word)
         {
+            if(word == null)
+            {
+                return BadRequest();
+            }
+            if(!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState);
+            }
+            word.Active = true;
+            word.CreationDate = DateTime.Now;
             await _repository.CreateAsync(word);
 
             var dtoword = _mapper.Map<Word, DTOWord>(word);
@@ -110,7 +120,20 @@ namespace MimicAPI.Controllers
                 return NotFound();
             }
 
+            if(word == null)
+            {
+                return BadRequest();
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState);
+            }
+
             word.Id = id;
+            word.Active = obj.Active;
+            word.CreationDate = obj.CreationDate;
+            word.UpdateDate = obj.UpdateDate;
             await _repository.UpdateAsync(obj);
 
             var dtoword = _mapper.Map<Word, DTOWord>(word);
