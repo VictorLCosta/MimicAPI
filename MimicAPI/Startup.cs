@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MimicAPI.Database;
-using MimicAPI.Repositories.Contracts;
-using MimicAPI.Repositories;
+using MimicAPI.V1.Repositories.Contracts;
+using MimicAPI.V1.Repositories;
 using AutoMapper;
 using MimicAPI.Helpers;
 
@@ -33,6 +33,10 @@ namespace MimicAPI
             });
 
             services.AddMvc();
+            services.AddApiVersioning(cfg =>{
+                cfg.ReportApiVersions = true;
+                cfg.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion (1, 0);
+            });
 
             //REPOSITORIES
             services.AddScoped<IWordRepository, WordRepository>();

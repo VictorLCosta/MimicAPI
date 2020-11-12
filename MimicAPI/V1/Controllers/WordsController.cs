@@ -4,16 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MimicAPI.Models;
+using MimicAPI.V1.Models;
 using MimicAPI.Helpers;
-using MimicAPI.Repositories.Contracts;
+using MimicAPI.V1.Repositories.Contracts;
 using Newtonsoft.Json;
 using AutoMapper;
-using MimicAPI.Models.DTO;
+using MimicAPI.V1.Models.DTO;
 
-namespace MimicAPI.Controllers
+namespace MimicAPI.V1.Controllers
 {
-    [Route("api/words")]
+    [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class WordsController : ControllerBase
     {
         private readonly IWordRepository _repository;
@@ -100,6 +102,7 @@ namespace MimicAPI.Controllers
             {
                 return UnprocessableEntity(ModelState);
             }
+            
             word.Active = true;
             word.CreationDate = DateTime.Now;
             await _repository.CreateAsync(word);
