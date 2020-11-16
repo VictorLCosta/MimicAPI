@@ -15,6 +15,7 @@ namespace MimicAPI.V1.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class WordsController : ControllerBase
     {
@@ -28,6 +29,7 @@ namespace MimicAPI.V1.Controllers
         }
 
         [HttpGet("", Name = "FindAllWords")]
+        [MapToApiVersion("1.1")]
         public IActionResult FindAllWords([FromQuery]WordUrlQuery query)
         {
             var item = _repository.FindAllWordsAsync(query);

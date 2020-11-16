@@ -12,6 +12,7 @@ using MimicAPI.V1.Repositories.Contracts;
 using MimicAPI.V1.Repositories;
 using AutoMapper;
 using MimicAPI.Helpers;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace MimicAPI
 {
@@ -35,7 +36,15 @@ namespace MimicAPI
             services.AddMvc();
             services.AddApiVersioning(cfg =>{
                 cfg.ReportApiVersions = true;
+                cfg.AssumeDefaultVersionWhenUnspecified = true;
                 cfg.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion (1, 0);
+            });
+
+            services.AddSwaggerGen(cfg => {
+                cfg.ResolveConflictingActions(apiDescription => apiDescription.First());
+                cfg.SwaggerDoc("v1", new Info() { 
+                    Title = "MimicAPI - V1", 
+                    Version = "v1"});
             });
 
             //REPOSITORIES
@@ -50,13 +59,16 @@ namespace MimicAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
+            app.UseStatusCodePages();
+            
+            app.UseMvc();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(cfg => {
+                cfg.SwaggerEndpoint("/swagger/v1/swagger.json", "MimicAPI");
+                cfg.RoutePrefix = String.Empty;
             });
 
-            app.UseStatusCodePages();
-            app.UseMvc();
         }
     }
 }
