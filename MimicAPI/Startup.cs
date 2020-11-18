@@ -14,6 +14,8 @@ using AutoMapper;
 using MimicAPI.Helpers;
 using MimicAPI.Helpers.Swagger;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.Extensions.PlatformAbstractions;
+using System.IO;
 
 namespace MimicAPI
 {
@@ -54,6 +56,12 @@ namespace MimicAPI
                 cfg.SwaggerDoc("v1.0", new Info() { 
                     Title = "MimicAPI - V1.0", 
                     Version = "v1.0"});
+
+                var ProjectPath = PlatformServices.Default.Application.ApplicationBasePath;
+                var ProjectName = $"{PlatformServices.Default.Application.ApplicationName}.xml";
+                var XMLFilePath = Path.Combine(ProjectPath, ProjectName);
+
+                cfg.IncludeXmlComments(XMLFilePath);
 
                 cfg.DocInclusionPredicate((docName, apiDesc) =>
                 {

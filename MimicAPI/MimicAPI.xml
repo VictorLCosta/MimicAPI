@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MimicAPI</name>
+    </assembly>
+    <members>
+        <member name="M:MimicAPI.V1.Controllers.WordsController.FindAllWords(MimicAPI.Helpers.WordUrlQuery)">
+            <summary>
+            Operação que seleciona do banco de dados todas as palavras existentes
+            </summary>
+            <param name="query">Filtros de pesquisa</param>
+            <returns>Listagem de palavras</returns>
+        </member>
+        <member name="M:MimicAPI.V1.Controllers.WordsController.FindWord(System.Int32)">
+            <summary>
+            Operação que obtém uma única palavra da base de dados
+            </summary>
+            <param name="id">Código identificador da palavra</param>
+            <returns>Retorna um objeto do tipo Word</returns>
+        </member>
+        <member name="M:MimicAPI.V1.Controllers.WordsController.Register(MimicAPI.V1.Models.Word)">
+            <summary>
+            Operação que realiza o cadastro de uma nova palavra
+            </summary>
+            <param name="word">Um objeto palavra</param>
+            <returns>Um objeto palavra com seu Id</returns>
+        </member>
+        <member name="M:MimicAPI.V1.Controllers.WordsController.Update(MimicAPI.V1.Models.Word,System.Int32)">
+            <summary>
+            Operação que realiza a substituição de dados de uma palavra específica
+            </summary>
+            <param name="word">Objeto palavra com dados para alteração</param>
+            <param name="id">Código identificador da palavra a ser alterada</param>
+            <returns></returns>
+        </member>
+        <member name="M:MimicAPI.V1.Controllers.WordsController.Delete(System.Int32)">
+            <summary>
+            Operação que desativa uma palavra do sistema
+            </summary>
+            <param name="id">Código identificador da palavra a ser desativada</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

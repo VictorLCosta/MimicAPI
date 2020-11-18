@@ -7,6 +7,11 @@ namespace MimicAPI.V2.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     public class WordsController : ControllerBase
     {
+        ///<summary>
+        ///Operação que seleciona do banco de dados todas as palavras existentes
+        ///</summary>
+        ///<param name="query">Filtros de pesquisa</param>
+        ///<returns>Listagem de palavras</returns>
         [HttpGet("", Name = "FindAllWords")]
         public string FindAllWords()
         {
